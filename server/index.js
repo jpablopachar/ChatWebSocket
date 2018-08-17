@@ -26,16 +26,6 @@ const servidor = app.listen(app.get('port'), () => {
 });
 
 /*                  Socket                      */
-const io = socketIO(servidor);
+module.exports.io = socketIO(servidor);
 
-/* io.on('connection', (socket) => {
-  console.log('Nueva conexion', socket.id);
-
-  socket.on('miMensaje', (datos) => {
-    io.sockets.emit('miMensaje', datos);
-  });
-
-  socket.on('escribiendo', (datos) => {
-    socket.broadcast.emit('escribiendo', datos);
-  });
-}); */
+require('./sockets/socket');
