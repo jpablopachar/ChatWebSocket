@@ -3,8 +3,6 @@ const morgan = require('morgan');
 const socketIO = require('socket.io');
 const path = require('path');
 
-// const tareaRoutes = require('./routes/tarea');
-
 const app = express();
 
 /*                  Ajustes                     */
@@ -18,7 +16,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 /*                    Rutas                      */
-// app.use('/', tareaRoutes);
 
 /*             Archivos Estáticos                */
 app.use(express.static(path.join(__dirname, 'public')));
@@ -29,9 +26,9 @@ const servidor = app.listen(app.get('port'), () => {
 });
 
 /*                  Socket                      */
-/* const io = socketIO(servidor);
+const io = socketIO(servidor);
 
-io.on('connection', (socket) => {
+/* io.on('connection', (socket) => {
   console.log('Nueva conexion', socket.id);
 
   socket.on('miMensaje', (datos) => {
