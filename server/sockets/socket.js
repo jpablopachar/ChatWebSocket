@@ -1,26 +1,28 @@
 const { io } = require('../index');
+const { Usuario } = require('../models/usuario');
+
+const usuario = new Usuario();
 
 io.on('connect', (cliente) => {
-  // console.log('Nueva conexion', socket.id);
-  console.log('Usuario conectado');
+  cliente.on('entrarChat', (datos, callback) => {
+    if (!datos.nombre) {
+      return callback({
+        error: true,
+        mensaje: 'El nombre es necesario',
+      });
+    }
 
-  cliente.emit('enviarMensaje', {
-    usuario: 'Administrador',
-    mensaje: 'Bienvenido a la aplicación',
+    const personas = usuario.agregarPersona(cliente.id, datos.nombre);
+
+    cliente.broadcast.emit('listarPersonas', usuario.obtenerPersonas());
+
+    return callback(personas);
   });
 
   cliente.on('disconnect', () => {
-    console.log('Usuario desconectado');
-  });
+    const personaBorrada = usuario.borrarPersona(cliente.id);
 
-  cliente.on('enviarMensaje', (mensaje, callback) => {
-    console.log(mensaje);
-
-    cliente.broadcast.emit('enviarMensaje', mensaje);
-    /* if (mensaje.usuario) {
-      callback({respuesta: 'Todo salió bien'});
-    } else {
-      callback({respuesta: 'Todo salió mal!'});
-    } */
+    cliente.broadcast.emit('crearMensaje', { usuario: 'Administrador', mensaje: `${personaBorrada.nombre} abandonó el chat` });
+    cliente.broadcast.emit('listarPersonas', usuario.obtenerPersonas());
   });
 });
