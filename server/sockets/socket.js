@@ -1,5 +1,6 @@
 const { io } = require('../index');
 const { Usuario } = require('../models/usuario');
+const { crearMensaje } = require('../utils/utilidadesSocket');
 
 const usuario = new Usuario();
 
@@ -19,10 +20,17 @@ io.on('connect', (cliente) => {
     return callback(personas);
   });
 
+  cliente.on('crearMensaje', (datos) => {
+    const persona = usuario.obtenerPersona(cliente.id);
+    const mensaje = crearMensaje(persona.nombre, datos.mensaje);
+
+    cliente.broadcast.emit('crearMensaje', mensaje);
+  });
+
   cliente.on('disconnect', () => {
     const personaBorrada = usuario.borrarPersona(cliente.id);
 
-    cliente.broadcast.emit('crearMensaje', { usuario: 'Administrador', mensaje: `${personaBorrada.nombre} abandonó el chat` });
+    cliente.broadcast.emit('crearMensaje', crearMensaje('Administrador', `${personaBorrada.nombre} salió`));
     cliente.broadcast.emit('listarPersonas', usuario.obtenerPersonas());
   });
 });
