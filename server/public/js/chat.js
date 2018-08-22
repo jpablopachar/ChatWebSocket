@@ -29,3 +29,7 @@ socket.on('crearMensaje', (mensaje) => {
 socket.on('listarPersonas', (personas) => {
   console.log(personas);
 });
+
+socket.on('mensajePrivado', (mensaje) => {
+  console.log('Mensaje privado: ', mensaje);
+});
