@@ -6,7 +6,6 @@ const usuario = new Usuario();
 
 io.on('connect', (cliente) => {
   cliente.on('entrarChat', (datos, callback) => {
-    console.log(datos);
     if (!datos.nombre || !datos.sala) {
       return callback({
         error: true,
@@ -18,7 +17,7 @@ io.on('connect', (cliente) => {
 
     const personas = usuario.agregarPersona(cliente.id, datos.nombre, datos.sala);
 
-    cliente.broadcast.emit('listarPersonas', usuario.obtenerPersonas());
+    cliente.broadcast.to(datos.sala).emit('listarPersonas', usuario.obtenerPersonasPorSala(datos.sala));
 
     return callback(personas);
   });
@@ -27,14 +26,14 @@ io.on('connect', (cliente) => {
     const persona = usuario.obtenerPersona(cliente.id);
     const mensaje = crearMensaje(persona.nombre, datos.mensaje);
 
-    cliente.broadcast.emit('crearMensaje', mensaje);
+    cliente.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
   });
 
   cliente.on('disconnect', () => {
     const personaBorrada = usuario.borrarPersona(cliente.id);
 
-    cliente.broadcast.emit('crearMensaje', crearMensaje('Administrador', `${personaBorrada.nombre} salió`));
-    cliente.broadcast.emit('listarPersonas', usuario.obtenerPersonas());
+    cliente.broadcast.to(personaBorrada.sala).emit('crearMensaje', crearMensaje('Administrador', `${personaBorrada.nombre} salió`));
+    cliente.broadcast.to(personaBorrada.sala).emit('listarPersonas', usuario.obtenerPersonasPorSala());
   });
 
   cliente.on('mensajePrivado', (datos) => {

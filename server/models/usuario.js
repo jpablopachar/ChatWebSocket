@@ -22,7 +22,9 @@ class Usuario {
   }
 
   obtenerPersonasPorSala(sala) {
-    // ---
+    const personasEnSala = this.personas.filter(persona => persona.sala === sala);
+
+    return personasEnSala;
   }
 
   borrarPersona(id) {
